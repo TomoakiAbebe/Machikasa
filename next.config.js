@@ -1,5 +1,4 @@
 const isProd = process.env.NODE_ENV === 'production';
-const isGithubPages = process.env.GITHUB_PAGES === 'true';
 
 const withPWA = require('next-pwa')({
   dest: 'public',
@@ -22,8 +21,6 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: isGithubPages ? '/Machikasa' : '',
-  assetPrefix: isGithubPages ? '/Machikasa/' : '',
   images: {
     unoptimized: true,
   },
