@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { LocalDB } from '@/lib/localDB';
 import { User, Transaction } from '@/types';
 import { formatDateJa, getRoleTextJa } from '@/lib/utils';
@@ -9,6 +10,7 @@ import { NoTransactionsEmpty } from '@/components/EmptyState';
 import { InfoTooltip } from '@/components/Tooltip';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -230,7 +232,7 @@ export default function ProfilePage() {
         <h3 className="text-xl font-semibold mb-4">最近の利用履歴 (直近5件)</h3>
         
         {transactions.length === 0 ? (
-          <NoTransactionsEmpty onStartUsing={() => window.location.href = '/scan'} />
+          <NoTransactionsEmpty onStartUsing={() => router.push('/scan')} />
         ) : (
           <div className="space-y-3">
             {transactions.map((transaction) => (
