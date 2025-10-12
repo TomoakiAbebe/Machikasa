@@ -161,22 +161,3 @@ function ToastItem({ toast, onHide }: ToastItemProps) {
   );
 }
 
-// Convenience functions for common toast types
-export const toast = {
-  success: (title: string, message?: string, duration?: number) => {
-    const context = useContext(ToastContext);
-    context.showToast({ type: 'success', title, message, duration });
-  },
-  error: (title: string, message?: string, duration?: number) => {
-    const context = useContext(ToastContext);
-    context.showToast({ type: 'error', title, message, duration });
-  },
-  warning: (title: string, message?: string, duration?: number) => {
-    const context = useContext(ToastContext);
-    context.showToast({ type: 'warning', title, message, duration });
-  },
-  info: (title: string, message?: string, duration?: number) => {
-    const context = useContext(ToastContext);
-    context.showToast({ type: 'info', title, message, duration });
-  },
-};
