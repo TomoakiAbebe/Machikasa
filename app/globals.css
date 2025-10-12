@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer base {
+  :root {
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-start-rgb: 0, 0, 0;
+      --background-end-rgb: 0, 0, 0;
+      --foreground-rgb: 255, 255, 255;
+    }
+  }
+}
+
+/* Custom component styles */
+.station-marker {
+  @apply bg-white rounded-full border-2 border-umbrella-blue shadow-lg p-2;
+}
+
+.umbrella-status-available {
+  @apply text-green-600 bg-green-100;
+}
+
+.umbrella-status-in-use {
+  @apply text-blue-600 bg-blue-100;
+}
+
+.umbrella-status-maintenance {
+  @apply text-orange-600 bg-orange-100;
+}
+
+.umbrella-status-lost {
+  @apply text-red-600 bg-red-100;
+}
+
+/* Animation for QR scanner */
+@keyframes scan-line {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.scan-line {
+  animation: scan-line 2s linear infinite;
+}

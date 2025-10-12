@@ -1,0 +1,16 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="24" fill="url(#bgGradient)"/>
+  <!-- Umbrella icon -->
+  <path d="M96 40 C 80 40, 64 50, 64 66 L 64 70 L 128 70 L 128 66 C 128 50, 112 40, 96 40 Z" fill="#ffffff"/>
+  <rect x="94" y="70" width="4" height="40" fill="#ffffff"/>
+  <path d="M98 105 Q 104 110, 98 115" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Japanese text -->
+  <text x="96" y="140" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#ffffff" font-weight="bold">まちかさ</text>
+  <text x="96" y="165" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#ffffff" opacity="0.9">Machikasa</text>
+</svg>
