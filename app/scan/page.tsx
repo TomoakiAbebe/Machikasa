@@ -4,11 +4,8 @@ import { useState, useEffect } from 'react';
 import { LocalDB } from '@/lib/localDB';
 import { User, Umbrella, Station } from '@/types';
 import QRScanner from '@/components/QRScanner';
-import { PrimaryButton, SuccessButton, DangerButton } from '@/components/Button';
-import { UmbrellaCard, InfoCard } from '@/components/Cards';
 import { useToast } from '@/components/Toast';
-import { isValidMachikasaQR, extractUmbrellaId, getRandomReturnMessage, formatDateJa, getStatusTextJa, getConditionTextJa } from '@/lib/utils';
-import { Camera, CheckCircle, AlertCircle } from 'lucide-react';
+import { isValidMachikasaQR, extractUmbrellaId, getRandomReturnMessage, getStatusTextJa, getConditionTextJa } from '@/lib/utils';
 
 export default function ScanPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -201,20 +198,214 @@ export default function ScanPage() {
   const canReturn = scannedUmbrella?.status === 'in_use' && scannedUmbrella?.borrowedBy === currentUser?.id;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          📱 QRスキャン
-        </h1>
-        <p className="text-gray-600">
-          傘のQRコードをスキャンして借りる・返すの操作を行います
-        </p>
+    <div className="bg-gray-50 min-h-screen">
+      {/* Mobile Header */}
+      <div className="md:pt-16 bg-white border-b border-gray-200">
+        <div className="px-4 py-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">📱 QRスキャン</h1>
+        </div>
       </div>
 
-      {/* Current User Info */}
+      {/* Current User Info - Mobile optimized */}
       {currentUser && (
-        <div className="bg-white rounded-lg p-4 shadow-md mb-6">
+        <div className="bg-white border-b border-gray-200 px-4 py-3 md:hidden">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">{currentUser.nameJa}</p>
+              <p className="text-xs text-gray-600">
+                {currentUser.points}pt・借用{currentUser.totalBorrows}回・返却{currentUser.totalReturns}回
+              </p>
+            </div>
+            <div className="text-lg">👤</div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile-first Scanner Experience */}
+      {!scannedUmbrella ? (
+        <div className="relative">
+          {!scanActive ? (
+            // Scan start screen - Full screen on mobile
+            <div className="h-[70vh] md:h-96 flex flex-col items-center justify-center bg-gray-900 text-white">
+              <div className="text-center px-6">
+                <div className="text-8xl md:text-6xl mb-6">📷</div>
+                <h2 className="text-2xl md:text-xl font-semibold mb-4">傘のQRコードをスキャン</h2>
+                <p className="text-gray-300 mb-8 text-sm md:text-base">
+                  傘に付いているQRコードをカメラに向けてください
+                </p>
+                <button
+                  onClick={() => setScanActive(true)}
+                  className="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold transform hover:scale-105 transition-all duration-200"
+                >
+                  📱 スキャン開始
+                </button>
+              </div>
+            </div>
+          ) : (
+            // Active scanning - Full screen camera preview on mobile
+            <div className="relative h-[70vh] md:h-96">
+              <QRScanner
+                isActive={scanActive}
+                onScan={handleScan}
+                onError={(error) => {
+                  showToast({
+                    type: 'error',
+                    title: 'スキャンエラー',
+                    message: error
+                  });
+                  setScanActive(false);
+                }}
+              />
+              
+              {/* Overlay controls */}
+              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+                <button
+                  onClick={() => setScanActive(false)}
+                  className="bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-3 rounded-full font-medium hover:bg-white transition-all"
+                >
+                  ✕ スキャン停止
+                </button>
+              </div>
+              
+              {/* Scanning indicator */}
+              <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
+                <div className="bg-blue-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
+                  🔍 QRコードを探しています...
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Tips section - visible when not scanning */}
+          {!scanActive && (
+            <div className="px-4 py-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-900 mb-2 text-sm">💡 スキャンのコツ</h3>
+                <ul className="text-blue-800 text-xs space-y-1">
+                  <li>• QRコードを画面中央に合わせてください</li>
+                  <li>• 十分な明るさがある場所で行ってください</li>
+                  <li>• コードから20-30cm離してスキャンしてください</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Scan success screen - Mobile optimized
+        <div className="px-4 py-6">
+          {/* Success feedback */}
+          <div className="text-center mb-6">
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <span className="text-3xl text-white">✅</span>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">スキャン完了！</h2>
+            <p className="text-green-600 font-medium">
+              傘の情報を取得しました
+            </p>
+          </div>
+
+          {/* Umbrella Details Card - Mobile optimized */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mx-4 mb-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">傘 {scannedUmbrella.id}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  ステーション: {umbrellaStation?.nameJa}
+                </p>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                scannedUmbrella.status === 'available' ? 'bg-green-100 text-green-800' :
+                scannedUmbrella.status === 'in_use' ? 'bg-blue-100 text-blue-800' :
+                'bg-orange-100 text-orange-800'
+              }`}>
+                {getStatusTextJa(scannedUmbrella.status)}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <span className="text-gray-600 block text-xs">状態</span>
+                <span className="font-medium text-gray-900">
+                  {getConditionTextJa(scannedUmbrella.condition)}
+                </span>
+              </div>
+              {scannedUmbrella.batteryLevel && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <span className="text-gray-600 block text-xs">バッテリー</span>
+                  <span className="font-medium text-gray-900">
+                    🔋 {scannedUmbrella.batteryLevel}%
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons - Large mobile buttons */}
+            <div className="space-y-4">
+              {canBorrow && (
+                <button
+                  onClick={handleBorrow}
+                  disabled={loading}
+                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white py-4 px-6 rounded-xl text-lg font-semibold transform hover:scale-[1.02] transition-all duration-200 disabled:transform-none"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      処理中...
+                    </span>
+                  ) : (
+                    '🚀 この傘を借りる'
+                  )}
+                </button>
+              )}
+              
+              {canReturn && (
+                <button
+                  onClick={handleReturn}
+                  disabled={loading}
+                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white py-4 px-6 rounded-xl text-lg font-semibold transform hover:scale-[1.02] transition-all duration-200 disabled:transform-none"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      処理中...
+                    </span>
+                  ) : (
+                    '✅ この傘を返却する'
+                  )}
+                </button>
+              )}
+              
+              {!canBorrow && !canReturn && (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">⚠️</div>
+                  <p className="text-gray-600 mb-2 font-medium">
+                    {scannedUmbrella.status === 'in_use' 
+                      ? '別のユーザーが使用中です'
+                      : 'この傘は現在利用できません'
+                    }
+                  </p>
+                  {scannedUmbrella.status === 'maintenance' && (
+                    <p className="text-sm text-orange-600">
+                      メンテナンス中のため利用できません
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              <button
+                onClick={resetScan}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-medium transition-colors"
+              >
+                🔄 別の傘をスキャン
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop User Info - hidden on mobile */}
+      {currentUser && (
+        <div className="hidden md:block bg-white mx-4 rounded-lg p-4 shadow-sm border border-gray-200 mb-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{currentUser.nameJa}</p>
@@ -229,169 +420,19 @@ export default function ScanPage() {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Scanner Section */}
-        <div className="bg-white rounded-lg p-6 shadow-md">
-          <h2 className="text-xl font-semibold mb-4">スキャナー</h2>
-          
-          {!scanActive && !scannedUmbrella && (
-            <div className="text-center">
-              <div className="text-6xl mb-4">📷</div>
-              <PrimaryButton onClick={() => setScanActive(true)}>
-                スキャンを開始
-              </PrimaryButton>
-            </div>
-          )}
 
-          {scanActive && (
-            <div>
-              <QRScanner
-                isActive={scanActive}
-                onScan={handleScan}
-                onError={(error) => {
-                  showToast({
-                    type: 'error',
-                    title: 'スキャンエラー',
-                    message: error
-                  });
-                  setScanActive(false);
-                }}
-              />
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => setScanActive(false)}
-                  className="text-gray-600 hover:text-gray-800 underline"
-                >
-                  スキャンを停止
-                </button>
-              </div>
-            </div>
-          )}
-
-          {scannedUmbrella && (
-            <div className="text-center">
-              <div className="text-4xl mb-4">✅</div>
-              <p className="text-green-600 font-medium mb-4">
-                傘をスキャンしました
-              </p>
-              <PrimaryButton onClick={resetScan}>
-                別の傘をスキャン
-              </PrimaryButton>
-            </div>
-          )}
+      {/* Instructions - Hidden on mobile unless scanning */}
+      {!scanActive && (
+        <div className="hidden md:block mx-4 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="font-semibold text-blue-900 mb-2">📱 使い方のヒント</h3>
+          <ul className="text-blue-800 text-sm space-y-1">
+            <li>• 傘に付いているQRコードをカメラに向けてください</li>
+            <li>• 十分な明るさがある場所で行ってください</li>
+            <li>• QRコードから適切な距離を保ってください</li>
+            <li>• 傘の返却でポイントがもらえます</li>
+          </ul>
         </div>
-
-        {/* Umbrella Info Section */}
-        <div className="bg-white rounded-lg p-6 shadow-md">
-          <h2 className="text-xl font-semibold mb-4">傘の情報</h2>
-          
-          {!scannedUmbrella ? (
-            <div className="text-center text-gray-500 py-8">
-              <div className="text-4xl mb-4">☂️</div>
-              <p>QRコードをスキャンして傘の情報を表示</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Umbrella Details */}
-              <div className="border rounded-lg p-4">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-semibold text-lg">傘 {scannedUmbrella.id}</h3>
-                    <p className="text-sm text-gray-600">
-                      ステーション: {umbrellaStation?.nameJa}
-                    </p>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    scannedUmbrella.status === 'available' ? 'bg-green-100 text-green-800' :
-                    scannedUmbrella.status === 'in_use' ? 'bg-blue-100 text-blue-800' :
-                    'bg-orange-100 text-orange-800'
-                  }`}>
-                    {getStatusTextJa(scannedUmbrella.status)}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-600">状態:</span>
-                    <span className="ml-2 font-medium">
-                      {getConditionTextJa(scannedUmbrella.condition)}
-                    </span>
-                  </div>
-                  {scannedUmbrella.batteryLevel && (
-                    <div>
-                      <span className="text-gray-600">バッテリー:</span>
-                      <span className="ml-2 font-medium">
-                        {scannedUmbrella.batteryLevel}%
-                      </span>
-                    </div>
-                  )}
-                  <div className="col-span-2">
-                    <span className="text-gray-600">最終更新:</span>
-                    <span className="ml-2 font-medium">
-                      {formatDateJa(scannedUmbrella.lastUpdated)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {canBorrow && (
-                  <SuccessButton
-                    onClick={handleBorrow}
-                    loading={loading}
-                    className="w-full"
-                    size="lg"
-                  >
-                    🚀 この傘を借りる
-                  </SuccessButton>
-                )}
-                
-                {canReturn && (
-                  <PrimaryButton
-                    onClick={handleReturn}
-                    loading={loading}
-                    className="w-full"
-                    size="lg"
-                  >
-                    ✅ この傘を返却する
-                  </PrimaryButton>
-                )}
-                
-                {!canBorrow && !canReturn && (
-                  <div className="text-center py-4">
-                    <p className="text-gray-600 mb-2">
-                      {scannedUmbrella.status === 'in_use' 
-                        ? '別のユーザーが使用中です'
-                        : 'この傘は現在利用できません'
-                      }
-                    </p>
-                    {scannedUmbrella.status === 'maintenance' && (
-                      <p className="text-sm text-orange-600">
-                        メンテナンス中のため利用できません
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-
-
-      {/* Instructions */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-2">📱 使い方のヒント</h3>
-        <ul className="text-blue-800 text-sm space-y-1">
-          <li>• 傘に付いているQRコードをカメラに向けてください</li>
-          <li>• カメラが使用できない場合は手動入力も可能です</li>
-          <li>• デモ用のQRコードはスキャナー画面下部にあります</li>
-          <li>• 傘の返却でポイントがもらえます</li>
-        </ul>
-      </div>
+      )}
     </div>
   );
 }

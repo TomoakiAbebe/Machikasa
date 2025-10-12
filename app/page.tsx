@@ -6,6 +6,7 @@ import { LocalDB } from '@/lib/localDB';
 import { User, Station, Transaction } from '@/types';
 import { StationCard, TransactionCard, InfoCard } from '@/components/Cards';
 import { PrimaryButton, SecondaryButton } from '@/components/Button';
+import FloatingActionButton from '@/components/FloatingActionButton';
 import { MapPin, Camera, TrendingUp } from 'lucide-react';
 
 export default function HomePage() {
@@ -30,68 +31,66 @@ export default function HomePage() {
   const totalCapacity = stations.reduce((sum, station) => sum + station.capacity, 0);
 
   return (
-    <div className="min-h-screen bg-machikasa-neutral">
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-        {/* Hero Section */}
-        <div className="text-center pt-4 pb-2">
-          <div className="mb-4">
-            <span className="text-5xl md:text-6xl block mb-3">☂️</span>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
-              Machikasa
+    <div className="min-h-screen bg-gray-50">
+      <div className="px-4 py-6 space-y-6">
+        {/* Mobile Hero Section */}
+        <div className="text-center pt-8 pb-6 md:pt-4 md:pb-2">
+          <div className="mb-6">
+            <span className="text-6xl block mb-4">☂️</span>
+            <h1 className="text-heading-xl mb-3">
+              MachiKasa
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-gray-700 mb-2 font-medium">福井大学傘シェアサービス</p>
-          <p className="text-sm md:text-base text-gray-600 mb-6">
-            雨の日をみんなで支える、地域コミュニティの傘シェアリング
+          <p className="text-heading-md text-gray-800 mb-2">福井大学傘シェア</p>
+          <p className="text-body mb-8">
+            雨の日をみんなで支える<br className="md:hidden" />
+            地域コミュニティの傘シェアリング
           </p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3 md:gap-6">
-          <InfoCard
-            title="利用可能"
-            value={totalUmbrellas}
-            subtitle="本の傘"
-            icon={<TrendingUp className="h-5 w-5" />}
-            color="blue"
-          />
-          <InfoCard
-            title="ステーション"
-            value={stations.length}
-            subtitle="箇所"
-            icon={<MapPin className="h-5 w-5" />}
-            color="green"
-          />
-          <InfoCard
-            title="ポイント"
-            value={currentUser?.points || 0}
-            subtitle="pt"
-            icon={<span className="text-lg">🎯</span>}
-            color="yellow"
-          />
+        {/* Mobile Quick Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+            <div className="text-2xl font-bold text-blue-500 mb-1">{totalUmbrellas}</div>
+            <div className="text-caption">利用可能</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+            <div className="text-2xl font-bold text-success mb-1">{stations.length}</div>
+            <div className="text-caption">ステーション</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+            <div className="text-2xl font-bold text-amber-600 mb-1">{currentUser?.points || 0}</div>
+            <div className="text-caption">ポイント</div>
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
+        {/* Mobile Action Buttons */}
+        <div className="space-y-4">
           <Link href="/map" className="block">
-            <PrimaryButton size="lg" fullWidth icon={<MapPin className="h-5 w-5" />}>
-              ステーションを見る
-            </PrimaryButton>
+            <button className="w-full bg-blue-500 text-white py-4 px-6 rounded-2xl font-semibold text-lg
+                             flex items-center justify-center space-x-3 shadow-sm
+                             active:scale-95 transition-transform duration-150">
+              <MapPin className="h-6 w-6" />
+              <span>ステーションを見る</span>
+            </button>
           </Link>
           <Link href="/scan" className="block">
-            <SecondaryButton size="lg" fullWidth icon={<Camera className="h-5 w-5" />}>
-              QRスキャン
-            </SecondaryButton>
+            <button className="w-full bg-white border-2 border-blue-500 text-blue-500 py-4 px-6 rounded-2xl 
+                             font-semibold text-lg flex items-center justify-center space-x-3 shadow-sm
+                             active:scale-95 transition-transform duration-150">
+              <Camera className="h-6 w-6" />
+              <span>QRコードをスキャン</span>
+            </button>
           </Link>
         </div>
 
-        {/* How it Works */}
-        <div className="space-y-4">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center">使い方</h2>
-          <div className="grid grid-cols-1 gap-4">
-            <div className="bg-white rounded-card p-4 shadow-card">
+        {/* Mobile How it Works */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-900 text-center">使い方</h2>
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-start space-x-4">
-                <div className="text-3xl flex-shrink-0">🔍</div>
+                <div className="text-4xl flex-shrink-0">🔍</div>
                 <div>
                   <h3 className="text-base font-semibold mb-2">1. ステーションを探す</h3>
                   <p className="text-sm text-gray-600">
@@ -162,6 +161,9 @@ export default function HomePage() {
           </p>
         </div>
       </div>
+      
+      {/* Floating Action Button for Quick Scan */}
+      <FloatingActionButton />
     </div>
   );
 }

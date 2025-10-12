@@ -2,15 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* Mobile-first global styles with WCAG AA compliance */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  /* Ensure minimum 16px base font size for accessibility */
+  font-size: 16px;
+  scroll-behavior: smooth;
+  
+  /* Better text rendering for mobile */
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  
+  /* Natural scroll momentum on mobile */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: bounce;
+}
+
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  /* System font stack prioritizing Japanese support */
+  font-family: 
+    -apple-system, BlinkMacSystemFont, 
+    "Helvetica Neue", "Segoe UI", 
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", 
+    "Yu Gothic", YuGothic, Meiryo, 
+    ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    
+  /* Improved font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Minimum font size enforcement */
+  font-size: 1rem; /* 16px */
+  line-height: 1.5; /* Improved readability */
+  
+  /* Default text color with WCAG AA contrast (4.5:1) */
+  color: rgb(17 24 39); /* gray-900 */
 }
 
 @layer base {
@@ -57,6 +87,121 @@ body {
   }
   100% {
     top: 100%;
+  }
+}
+
+/* Mobile utilities with accessibility focus */
+@layer utilities {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Typography with WCAG AA compliance */
+  .text-body {
+    @apply text-base leading-6 text-gray-900; /* 16px, WCAG AA contrast */
+  }
+  
+  .text-body-sm {
+    @apply text-sm leading-5 text-gray-700; /* 14px minimum for mobile */
+  }
+  
+  .text-caption {
+    @apply text-sm leading-4 text-gray-600; /* 14px for captions */
+  }
+  
+  .text-heading-xl {
+    @apply text-2xl md:text-3xl font-bold leading-tight text-gray-900;
+  }
+  
+  .text-heading-lg {
+    @apply text-xl md:text-2xl font-semibold leading-tight text-gray-900;
+  }
+  
+  .text-heading-md {
+    @apply text-lg md:text-xl font-semibold leading-6 text-gray-900;
+  }
+  
+  .text-heading-sm {
+    @apply text-base md:text-lg font-semibold leading-6 text-gray-900;
+  }
+  
+  /* High contrast colors for accessibility */
+  .text-primary {
+    @apply text-blue-600; /* WCAG AA contrast on white */
+  }
+  
+  .text-success {
+    @apply text-green-700; /* Enhanced contrast */
+  }
+  
+  .text-warning {
+    @apply text-amber-700; /* Enhanced contrast */
+  }
+  
+  .text-error {
+    @apply text-red-700; /* Enhanced contrast */
+  }
+  
+  /* Mobile button states with accessibility */
+  .btn-mobile {
+    @apply min-w-[44px] min-h-[44px] touch-manipulation tap-highlight-none;
+    @apply transition-transform active:scale-95;
+    @apply font-medium text-base; /* Minimum 16px font for buttons */
+  }
+  
+  /* Mobile card with improved typography */
+  .card-mobile {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100;
+    @apply p-4 mb-3;
+  }
+  
+  /* Focus states for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+  
+  /* Touch-friendly interactions */
+  .touch-card {
+    @apply card-mobile hover:shadow-md active:scale-[0.99] transition-all duration-150;
+  }
+  
+  .touch-list-item {
+    @apply p-4 border-b border-gray-100 active:bg-gray-50 transition-colors duration-150 touch-manipulation;
+  }
+  
+  /* Enhanced scroll areas */
+  .scroll-area {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .text-body {
+      @apply text-black;
+    }
+    
+    .bg-surface {
+      @apply bg-white border border-gray-400;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

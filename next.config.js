@@ -5,14 +5,67 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: !isProd,
+  fallbacks: {
+    document: '/Machikasa/_offline', // Offline fallback page
+  },
   runtimeCaching: [
+    // Cache pages with NetworkFirst strategy
+    {
+      urlPattern: /^\/Machikasa\/$/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
+    },
+    // Cache API data with StaleWhileRevalidate
+    {
+      urlPattern: /\/api\/.*/,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'api-cache',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 5 * 60, // 5 minutes
+        },
+      },
+    },
+    // Cache static assets with CacheFirst
+    {
+      urlPattern: /\.(png|jpg|jpeg|svg|gif|webp|ico)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'static-assets',
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
+    },
+    // Cache web fonts
+    {
+      urlPattern: /\.(woff|woff2|eot|ttf|otf)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'fonts-cache',
+        expiration: {
+          maxEntries: 20,
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+        },
+      },
+    },
+    // General network cache
     {
       urlPattern: /^https?.*/,
       handler: 'NetworkFirst',
       options: {
-        cacheName: 'offlineCache',
+        cacheName: 'general-cache',
         expiration: {
-          maxEntries: 200,
+          maxEntries: 100,
+          maxAgeSeconds: 24 * 60 * 60, // 1 day
         },
       },
     },

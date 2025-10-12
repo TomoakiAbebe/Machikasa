@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline';
@@ -20,22 +20,24 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-card transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:active:scale-100';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.96] disabled:active:scale-100 touch-manipulation relative overflow-hidden';
   
+  // WCAG AA compliant color variants with better contrast
   const variantClasses = {
-    primary: 'bg-machikasa-blue text-white hover:bg-blue-600 focus:ring-machikasa-blue disabled:bg-blue-300 shadow-sm hover:shadow-md',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 disabled:bg-gray-50 border border-gray-200',
-    outline: 'border-2 border-machikasa-blue text-machikasa-blue hover:bg-machikasa-blue hover:text-white focus:ring-machikasa-blue disabled:border-blue-300 disabled:text-blue-300',
-    success: 'bg-return-green text-white hover:bg-green-600 focus:ring-return-green disabled:bg-green-300 shadow-sm hover:shadow-md',
-    warning: 'bg-warning-amber text-white hover:bg-yellow-600 focus:ring-warning-amber disabled:bg-yellow-300 shadow-sm hover:shadow-md',
-    danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 disabled:bg-red-300 shadow-sm hover:shadow-md'
+    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-blue-300 shadow-sm hover:shadow-md',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 disabled:bg-gray-50 border border-gray-300',
+    outline: 'border-2 border-blue-600 text-blue-700 hover:bg-blue-600 hover:text-white focus:ring-blue-500 disabled:border-blue-300 disabled:text-blue-300',
+    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 disabled:bg-green-300 shadow-sm hover:shadow-md',
+    warning: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 disabled:bg-amber-300 shadow-sm hover:shadow-md',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300 shadow-sm hover:shadow-md'
   };
   
+  // Mobile-first sizing with minimum 44px touch target
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm min-h-[32px]',
-    md: 'px-4 py-2 text-base min-h-[40px]',
-    lg: 'px-6 py-3 text-base min-h-[48px]',
-    xl: 'px-8 py-4 text-lg min-h-[56px]'
+    sm: 'px-4 py-2 text-sm min-h-[40px] min-w-[40px]', // Still accessible
+    md: 'px-6 py-3 text-base min-h-[44px] min-w-[44px]', // Standard mobile touch target
+    lg: 'px-8 py-4 text-base min-h-[48px] min-w-[48px]', // Large touch target
+    xl: 'px-10 py-5 text-lg min-h-[56px] min-w-[56px]' // Extra large for primary actions
   };
 
   const classes = `
@@ -47,12 +49,55 @@ export default function Button({
     ${className}
   `.trim().replace(/\s+/g, ' ');
 
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Create ripple effect
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const newRipple = {
+      id: Date.now(),
+      x,
+      y
+    };
+    
+    setRipples(prev => [...prev, newRipple]);
+    
+    // Remove ripple after animation
+    setTimeout(() => {
+      setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
+    }, 600);
+    
+    // Call original onClick if provided
+    if (props.onClick) {
+      props.onClick(e);
+    }
+  };
+
   return (
     <button
       className={classes}
       disabled={disabled || loading}
       {...props}
+      onClick={handleClick}
     >
+      {/* Ripple effects */}
+      {ripples.map(ripple => (
+        <span
+          key={ripple.id}
+          className="absolute rounded-full bg-white/30 pointer-events-none animate-ping"
+          style={{
+            left: ripple.x - 10,
+            top: ripple.y - 10,
+            width: 20,
+            height: 20,
+          }}
+        />
+      ))}
+      
       {loading && (
         <svg
           className="animate-spin -ml-1 mr-2 h-4 w-4"
