@@ -1,8 +1,11 @@
+const isProd = process.env.NODE_ENV === 'production';
+const isGithubPages = process.env.GITHUB_PAGES === 'true';
+
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: !isProd,
   runtimeCaching: [
     {
       urlPattern: /^https?.*/,
@@ -19,14 +22,13 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: isGithubPages ? '/Machikasa' : '',
+  assetPrefix: isGithubPages ? '/Machikasa/' : '',
   images: {
-    domains: ['localhost'],
-    unoptimized: true, // Required for static export
+    unoptimized: true,
   },
   output: 'export',
   trailingSlash: true,
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/MachiKasa' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/MachiKasa' : '',
 }
 
 module.exports = withPWA(nextConfig)

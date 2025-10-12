@@ -8,7 +8,8 @@ import { ToastProvider } from '@/components/Toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const basePath = process.env.NODE_ENV === 'production' ? '/MachiKasa' : '';
+const isGithubPages = process.env.GITHUB_PAGES === 'true';
+const basePath = isGithubPages ? '/Machikasa' : '';
 
 export const metadata: Metadata = {
   title: 'Machikasa - 福井大学傘シェア',
