@@ -21,6 +21,9 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // GitHub Pages用の設定
+  basePath: '/Machikasa',
+  assetPrefix: '/Machikasa/',
   images: {
     unoptimized: true,
   },

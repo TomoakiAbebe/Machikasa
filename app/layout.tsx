@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Machikasa - 福井大学傘シェア',
   description: 'Local umbrella sharing app prototype for Fukui University',
   keywords: ['umbrella', 'sharing', 'fukui', 'university', 'community'],
-  manifest: './manifest.json',
+  manifest: '/Machikasa/manifest.json',
   themeColor: '#3b82f6',
   viewport: {
     width: 'device-width',
@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: './icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' },
-      { url: './icon-512x512.svg', sizes: '512x512', type: 'image/svg+xml' }
+      { url: '/Machikasa/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' },
+      { url: '/Machikasa/icon-512x512.svg', sizes: '512x512', type: 'image/svg+xml' }
     ],
     apple: [
-      { url: './icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }
+      { url: '/Machikasa/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }
     ]
   }
 };
@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        <link rel="manifest" href="./manifest.json" />
+        <link rel="manifest" href="/Machikasa/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
