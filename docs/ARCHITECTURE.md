@@ -191,7 +191,7 @@ const QRScanner = dynamic(() => import('@/components/QRScanner'), {
 import Image from 'next/image';
 
 <Image
-  src="/qr/umb-001.svg"
+  src="./qr/umb-001.svg"
   alt="QR Code"
   width={200}
   height={200}

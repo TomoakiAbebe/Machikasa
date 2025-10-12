@@ -643,11 +643,11 @@ npm run build:analyze
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
 
 // Preload critical resources
-<link rel="preload" href="/critical-font.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="./critical-font.woff2" as="font" type="font/woff2" crossorigin />
 
 // Optimize images
 <Image
-  src="/hero.jpg"
+  src="./hero.jpg"
   alt="Hero"
   priority={true}
   sizes="(max-width: 768px) 100vw, 50vw"

@@ -501,7 +501,7 @@ const HeavyChart = lazy(() => import('@/components/HeavyChart'));
 import Image from 'next/image';
 
 <Image
-  src="/sponsors/logo.svg"
+  src="./sponsors/logo.svg"
   alt="Partner Logo"
   width={150}
   height={75}
