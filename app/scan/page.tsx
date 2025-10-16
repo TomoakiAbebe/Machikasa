@@ -6,6 +6,7 @@ import { User, Umbrella, Station } from '@/types';
 import QRScanner from '@/components/QRScanner';
 import { useToast } from '@/components/Toast';
 import NudgeMessage, { useNudgeMessage } from '@/components/NudgeMessage';
+import FullScreenMessage, { useFullScreenMessage } from '@/components/FullScreenMessage';
 import { isValidMachikasaQR, extractUmbrellaId, getRandomReturnMessage, getStatusTextJa, getConditionTextJa } from '@/lib/utils';
 
 export default function ScanPage() {
@@ -16,7 +17,7 @@ export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   
-  // ナッジメッセージ機能
+  // ナッジメッセージ機能（従来版）
   const { 
     isVisible: nudgeVisible, 
     messageType: nudgeType, 
@@ -24,6 +25,15 @@ export default function ScanPage() {
     showMessage: showNudgeMessage, 
     hideMessage: hideNudgeMessage 
   } = useNudgeMessage();
+
+  // フルスクリーンメッセージ機能（新版）
+  const {
+    isVisible: fullScreenVisible,
+    messageType: fullScreenType,
+    customMessage: fullScreenCustomMessage,
+    showMessage: showFullScreenMessage,
+    hideMessage: hideFullScreenMessage
+  } = useFullScreenMessage();
 
   useEffect(() => {
     LocalDB.initialize();
@@ -102,17 +112,17 @@ export default function ScanPage() {
       );
       
       if (result.success) {
-        // まずナッジメッセージを表示
-        showNudgeMessage('borrow');
+        // フルスクリーンメッセージを表示（メイン体験）
+        showFullScreenMessage('borrow');
         
-        // ナッジメッセージの後に簡潔なトーストも表示
+        // フルスクリーンメッセージの後に簡潔なトーストも表示
         setTimeout(() => {
           showToast({
             type: 'success',
             title: '借用完了 ☂️',
             message: '雨の日も安心です。返却をお忘れなく！'
           });
-        }, 1000);
+        }, 3800); // フルスクリーンメッセージが終わってから表示
         
         // Refresh data
         setCurrentUser(LocalDB.getCurrentUser());
@@ -171,10 +181,10 @@ export default function ScanPage() {
       );
       
       if (result.success) {
-        // まずナッジメッセージを表示（返却のメインフィードバック）
-        showNudgeMessage('return');
+        // フルスクリーンメッセージを表示（返却のメインフィードバック）
+        showFullScreenMessage('return');
         
-        // 少し遅れてトーストも表示（ポイント情報含む）
+        // フルスクリーンメッセージの後にトーストも表示（ポイント情報含む）
         setTimeout(() => {
           const baseMessage = getRandomReturnMessage();
           const message = result.points 
@@ -186,7 +196,7 @@ export default function ScanPage() {
             title: '返却完了！',
             message: message
           });
-        }, 1500);
+        }, 3800); // フルスクリーンメッセージが終わってから表示
         
         // Refresh data
         setCurrentUser(LocalDB.getCurrentUser());
@@ -456,7 +466,15 @@ export default function ScanPage() {
         </div>
       )}
 
-      {/* ナッジメッセージコンポーネント */}
+      {/* フルスクリーンメッセージコンポーネント（メイン） */}
+      <FullScreenMessage
+        isVisible={fullScreenVisible}
+        onComplete={hideFullScreenMessage}
+        type={fullScreenType}
+        customMessage={fullScreenCustomMessage}
+      />
+
+      {/* ナッジメッセージコンポーネント（予備/従来版） */}
       <NudgeMessage
         isVisible={nudgeVisible}
         onComplete={hideNudgeMessage}

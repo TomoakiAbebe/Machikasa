@@ -7,6 +7,7 @@ import StationCard from '@/components/StationCard';
 import Modal from '@/components/Modal';
 import FloatingActionButton from '@/components/FloatingActionButton';
 import NudgeMessage, { useNudgeMessage } from '@/components/NudgeMessage';
+import FullScreenMessage, { useFullScreenMessage } from '@/components/FullScreenMessage';
 
 // Note: In a real app, you'd load Google Maps API dynamically
 // For this demo, we'll simulate map functionality with a visual representation
@@ -155,6 +156,13 @@ export default function MapPage() {
   const [showPartnerModal, setShowPartnerModal] = useState(false);
   
   const { showMessage, isVisible, messageType, customMessage } = useNudgeMessage();
+  const {
+    isVisible: fullScreenVisible,
+    messageType: fullScreenType,
+    customMessage: fullScreenCustomMessage,
+    showMessage: showFullScreenMessage,
+    hideMessage: hideFullScreenMessage
+  } = useFullScreenMessage();
 
   // Center on Fukui University
   const mapCenter = { lat: 36.0668, lng: 136.2189 };
@@ -442,11 +450,11 @@ export default function MapPage() {
               <div className="space-y-3 pt-4">
                 <button 
                   onClick={() => {
-                    showMessage('borrow');
+                    showFullScreenMessage('borrow');
                     setTimeout(() => {
                       // ここで実際の借用処理を行う
                       console.log('傘を借りる処理');
-                    }, 1500);
+                    }, 3800);
                   }}
                   className="w-full bg-blue-500 text-white py-4 rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold"
                 >
@@ -521,6 +529,22 @@ export default function MapPage() {
           </div>
         )}
       </Modal>
+
+      {/* フルスクリーンメッセージコンポーネント */}
+      <FullScreenMessage
+        isVisible={fullScreenVisible}
+        onComplete={hideFullScreenMessage}
+        type={fullScreenType}
+        customMessage={fullScreenCustomMessage}
+      />
+
+      {/* ナッジメッセージコンポーネント（従来版） */}
+      <NudgeMessage
+        isVisible={isVisible}
+        onComplete={() => {}}
+        type={messageType}
+        customMessage={customMessage}
+      />
     </div>
   );
 }
