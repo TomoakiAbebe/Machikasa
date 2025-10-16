@@ -105,12 +105,12 @@ export default function ScanPage() {
         // まずナッジメッセージを表示
         showNudgeMessage('borrow');
         
-        // 少し遅れてトーストも表示
+        // ナッジメッセージの後に簡潔なトーストも表示
         setTimeout(() => {
           showToast({
             type: 'success',
-            title: '貸出完了！',
-            message: '傘を借りました。お気をつけてお出かけください。'
+            title: '借用完了 ☂️',
+            message: '雨の日も安心です。返却をお忘れなく！'
           });
         }, 1000);
         

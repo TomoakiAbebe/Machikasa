@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface NudgeMessageProps {
   isVisible: boolean;
@@ -9,7 +9,7 @@ interface NudgeMessageProps {
   customMessage?: string;
 }
 
-// ランダムメッセージのプール（タイプ別）
+// ランダムメッセージのプール（ナッジ理論に基づく）
 const NUDGE_MESSAGES = {
   return: [
     "ありがとう！また使ってね☂️",
@@ -18,10 +18,18 @@ const NUDGE_MESSAGES = {
     "小さな行動が大きな助けになります💧",
     "Good job returning your umbrella! 🎉"
   ],
+  // 🧠 ナッジ理論に基づく借用メッセージ
+  // - 社会的つながり ("次の人のために")
+  // - 感情的な温かさ ("今日のあなたが誰かを助けています")
+  // - 自己効力感 ("あなたの小さな行動が地域を変えます")
   borrow: [
-    "雨の日も安心！気をつけて行ってらっしゃい☂️",
-    "傘を大切に使ってくださいね😊",
-    "お疲れさまです！忘れずに返却をお願いします🌈"
+    "次の人のために、大切に使ってね☂️",
+    "あなたの小さな行動が地域を変えます🌦",
+    "今日のあなたが、誰かを助けています😊",
+    "気をつけていってらっしゃい☂️",
+    "みんなでつくる、やさしい街づくり�",
+    "雨の日も安心、コミュニティの力です🌈",
+    "シェアする心が、つながりを生みます✨"
   ],
   general: [
     "ありがとうございます！",
@@ -40,12 +48,12 @@ export default function NudgeMessage({
   const [isAnimating, setIsAnimating] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
 
-  // ランダムメッセージを選択
-  const getRandomMessage = () => {
+  // ランダムメッセージを選択（useCallbackでメモ化）
+  const getRandomMessage = useCallback(() => {
     if (customMessage) return customMessage;
     const messages = NUDGE_MESSAGES[type];
     return messages[Math.floor(Math.random() * messages.length)];
-  };
+  }, [customMessage, type]);
 
   useEffect(() => {
     if (isVisible) {
@@ -70,83 +78,101 @@ export default function NudgeMessage({
         clearTimeout(completeTimer);
       };
     }
-  }, [isVisible, type, customMessage, onComplete]);
+  }, [isVisible, getRandomMessage, onComplete]);
 
   if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      {/* オーバーレイ背景 */}
+      {/* 温かい色調のオーバーレイ背景 - ライトブルーのグラデーション */}
       <div 
         className={`
-          absolute inset-0 bg-black/20 transition-opacity duration-500
+          absolute inset-0 transition-opacity duration-500
           ${isAnimating ? 'opacity-100' : 'opacity-0'}
         `}
+        style={{
+          background: type === 'borrow' 
+            ? 'linear-gradient(135deg, rgba(135, 206, 250, 0.85) 0%, rgba(173, 216, 230, 0.9) 100%)'
+            : 'linear-gradient(135deg, rgba(144, 238, 144, 0.85) 0%, rgba(152, 251, 152, 0.9) 100%)'
+        }}
       />
       
-      {/* メインメッセージカード */}
+      {/* メインメッセージカード - より丸みを帯びた、温かいデザイン */}
       <div 
         className={`
-          relative bg-white rounded-3xl shadow-2xl border border-blue-100 p-8 mx-4 max-w-sm
-          transform transition-all duration-700 ease-out
+          relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-8 mx-4 max-w-sm
+          transform transition-all duration-800 ease-out
           ${isAnimating 
             ? 'opacity-100 scale-100 translate-y-0' 
-            : 'opacity-0 scale-95 translate-y-4'
+            : 'opacity-0 scale-90 translate-y-8'
           }
         `}
+        style={{
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5)'
+        }}
       >
-        {/* アニメーション用の装飾 */}
+        {/* 温かみのある装飾要素 */}
         <div className="absolute -top-4 -right-4">
           <div 
             className={`
-              w-8 h-8 bg-blue-500 rounded-full transform transition-all duration-1000
+              w-10 h-10 rounded-full transform transition-all duration-1000 flex items-center justify-center text-white text-lg
               ${isAnimating ? 'scale-100 rotate-180' : 'scale-0 rotate-0'}
+              ${type === 'borrow' 
+                ? 'bg-gradient-to-br from-blue-400 to-blue-500' 
+                : 'bg-gradient-to-br from-green-400 to-green-500'
+              }
             `}
+            style={{
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+            }}
           >
-            <div className="flex items-center justify-center h-full text-white text-sm">
-              ☂️
-            </div>
+            {type === 'return' ? '🙏' : type === 'borrow' ? '☂️' : '😊'}
           </div>
         </div>
 
-        {/* メッセージテキスト */}
+        {/* メッセージテキスト - より感動的なスタイリング */}
         <div className="text-center">
           <div 
             className={`
-              text-2xl mb-4 transform transition-all duration-500 delay-200
-              ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
+              text-4xl mb-6 transform transition-all duration-600 delay-200
+              ${isAnimating ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}
             `}
           >
-            {type === 'return' ? '🙏' : type === 'borrow' ? '☂️' : '😊'}
+            {type === 'return' ? '�' : type === 'borrow' ? '🌟' : '😊'}
           </div>
           
           <p 
             className={`
-              text-lg text-gray-800 font-medium leading-relaxed
-              transform transition-all duration-500 delay-300
-              ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
+              text-xl text-gray-700 font-medium leading-relaxed text-center px-2
+              transform transition-all duration-600 delay-400
+              ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}
-            style={{ fontFamily: '"Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif' }}
+            style={{ 
+              fontFamily: '"Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif',
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            }}
           >
             {message}
           </p>
         </div>
 
-        {/* パーティクル効果（CSS-only） */}
+        {/* 優しいパーティクル効果 */}
         {showParticles && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-            {[...Array(8)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <div
                 key={i}
                 className={`
-                  absolute w-2 h-2 bg-blue-400 rounded-full animate-bounce
-                  ${isAnimating ? 'opacity-60' : 'opacity-0'}
+                  absolute w-1.5 h-1.5 rounded-full animate-bounce transition-opacity duration-300
+                  ${isAnimating ? 'opacity-40' : 'opacity-0'}
+                  ${type === 'borrow' ? 'bg-blue-300' : 'bg-green-300'}
                 `}
                 style={{
-                  left: `${10 + (i * 10)}%`,
-                  top: `${20 + (i % 3) * 20}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: '1.5s'
+                  left: `${5 + (i * 7)}%`,
+                  top: `${15 + (i % 4) * 15}%`,
+                  animationDelay: `${i * 0.15}s`,
+                  animationDuration: '2s',
+                  filter: 'blur(0.5px)'
                 }}
               />
             ))}
