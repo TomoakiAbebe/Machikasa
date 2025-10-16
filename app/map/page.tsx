@@ -6,6 +6,7 @@ import { Station, Umbrella, PartnerStore, Sponsor } from '@/types';
 import StationCard from '@/components/StationCard';
 import Modal from '@/components/Modal';
 import FloatingActionButton from '@/components/FloatingActionButton';
+import NudgeMessage, { useNudgeMessage } from '@/components/NudgeMessage';
 
 // Note: In a real app, you'd load Google Maps API dynamically
 // For this demo, we'll simulate map functionality with a visual representation
@@ -152,6 +153,8 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true);
   const [showStationModal, setShowStationModal] = useState(false);
   const [showPartnerModal, setShowPartnerModal] = useState(false);
+  
+  const { showMessage, isVisible, messageType, customMessage } = useNudgeMessage();
 
   // Center on Fukui University
   const mapCenter = { lat: 36.0668, lng: 136.2189 };
@@ -371,6 +374,14 @@ export default function MapPage() {
       {/* Floating Action Button */}
       <FloatingActionButton href="/scan" />
 
+      {/* Nudge Message */}
+      <NudgeMessage 
+        isVisible={isVisible}
+        type={messageType}
+        customMessage={customMessage}
+        onComplete={() => {}}
+      />
+
       {/* Station Details Modal */}
       <Modal 
         isOpen={showStationModal} 
@@ -429,7 +440,16 @@ export default function MapPage() {
               </div>
               
               <div className="space-y-3 pt-4">
-                <button className="w-full bg-blue-500 text-white py-4 rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold">
+                <button 
+                  onClick={() => {
+                    showMessage('borrow');
+                    setTimeout(() => {
+                      // ここで実際の借用処理を行う
+                      console.log('傘を借りる処理');
+                    }, 1500);
+                  }}
+                  className="w-full bg-blue-500 text-white py-4 rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold"
+                >
                   傘を借りる
                 </button>
                 <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors">
@@ -481,7 +501,16 @@ export default function MapPage() {
               )}
               
               <div className="space-y-3 pt-4">
-                <button className="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition-colors text-lg font-semibold">
+                <button 
+                  onClick={() => {
+                    showMessage('return');
+                    setTimeout(() => {
+                      // ここで実際の返却処理を行う
+                      console.log('傘を返却する処理');
+                    }, 1500);
+                  }}
+                  className="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition-colors text-lg font-semibold"
+                >
                   傘を返却する
                 </button>
                 <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors">

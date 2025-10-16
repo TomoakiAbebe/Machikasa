@@ -5,6 +5,7 @@ import { LocalDB } from '@/lib/localDB';
 import { User, Umbrella, Station } from '@/types';
 import QRScanner from '@/components/QRScanner';
 import { useToast } from '@/components/Toast';
+import NudgeMessage, { useNudgeMessage } from '@/components/NudgeMessage';
 import { isValidMachikasaQR, extractUmbrellaId, getRandomReturnMessage, getStatusTextJa, getConditionTextJa } from '@/lib/utils';
 
 export default function ScanPage() {
@@ -14,6 +15,15 @@ export default function ScanPage() {
   const [scanActive, setScanActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  
+  // ナッジメッセージ機能
+  const { 
+    isVisible: nudgeVisible, 
+    messageType: nudgeType, 
+    customMessage: nudgeCustomMessage,
+    showMessage: showNudgeMessage, 
+    hideMessage: hideNudgeMessage 
+  } = useNudgeMessage();
 
   useEffect(() => {
     LocalDB.initialize();
@@ -92,11 +102,17 @@ export default function ScanPage() {
       );
       
       if (result.success) {
-        showToast({
-          type: 'success',
-          title: '貸出完了！',
-          message: '傘を借りました。お気をつけてお出かけください。'
-        });
+        // まずナッジメッセージを表示
+        showNudgeMessage('borrow');
+        
+        // 少し遅れてトーストも表示
+        setTimeout(() => {
+          showToast({
+            type: 'success',
+            title: '貸出完了！',
+            message: '傘を借りました。お気をつけてお出かけください。'
+          });
+        }, 1000);
         
         // Refresh data
         setCurrentUser(LocalDB.getCurrentUser());
@@ -155,16 +171,22 @@ export default function ScanPage() {
       );
       
       if (result.success) {
-        const baseMessage = getRandomReturnMessage();
-        const message = result.points 
-          ? `${baseMessage} +${result.points}pt獲得！`
-          : baseMessage;
-          
-        showToast({
-          type: 'success',
-          title: '返却完了！',
-          message: message
-        });
+        // まずナッジメッセージを表示（返却のメインフィードバック）
+        showNudgeMessage('return');
+        
+        // 少し遅れてトーストも表示（ポイント情報含む）
+        setTimeout(() => {
+          const baseMessage = getRandomReturnMessage();
+          const message = result.points 
+            ? `${baseMessage} +${result.points}pt獲得！`
+            : baseMessage;
+            
+          showToast({
+            type: 'success',
+            title: '返却完了！',
+            message: message
+          });
+        }, 1500);
         
         // Refresh data
         setCurrentUser(LocalDB.getCurrentUser());
@@ -433,6 +455,14 @@ export default function ScanPage() {
           </ul>
         </div>
       )}
+
+      {/* ナッジメッセージコンポーネント */}
+      <NudgeMessage
+        isVisible={nudgeVisible}
+        onComplete={hideNudgeMessage}
+        type={nudgeType}
+        customMessage={nudgeCustomMessage}
+      />
     </div>
   );
 }
